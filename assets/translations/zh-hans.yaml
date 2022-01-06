@@ -6431,5 +6431,36 @@ charts:
     enablePSP:
       label: Pod 安全策略
       description: 为 Longhorn 工作负载设置 Pod 安全策略
-    
-
+    csi.kubeletRootDir:
+      label: Kubelet 根目录
+      description: 指定 kubelet root-dir。如留空，则自动检测。
+    csi.attacherReplicaCount:
+      label: Longhorn CSI Attacher 副本数
+      description: 指定 CSI Attacher 的副本数。默认值是 3。
+    csi.provisionerReplicaCount:
+      label: Longhorn CSI Provisioner 副本数
+      description: 指定 CSI Provisioner 的副本数。默认值是 3。
+    csi.resizerReplicaCount:
+      label: Longhorn CSI Resizer 副本数
+      description: 指定 CSI Resizer 的副本数。默认值是 3
+    csi.snapshotterReplicaCount:
+      label: Longhorn CSI Snapshotter 副本数
+      description: 指定 CSI Snapshotter 的副本数。默认值是 3。
+    defaultSettings.backupTarget:
+      label: 备份目标
+      description: 用于访问备份存储的端点。支持 NFS 和 S3。
+    defaultSettings.backupTargetCredentialSecret:
+      label: 备份目标凭证密文
+      description: 与备份目标关联的 Kubernetes 密文
+    defaultSettings.allowRecurringJobWhileVolumeDetached:
+      label: 拔出卷时允许定时 Job
+      description: "如启用，Longhorn 会自动插入卷，并在定期快照/备份时间创建快照/备份。请知悉，在卷自动插入期间，卷并未为工作负载就绪。工作负载需要等待直至定期 Job 完成。"
+    defaultSettings.createDefaultDiskLabeledNodes:
+      label: 在标签节点上创建默认磁盘
+      description: 如果没有其他磁盘，则仅在标签为 "node.longhorn.io/create-default-disk=true" 的节点上自动创建默认磁盘。如禁用，会在最初添加节点时，在所有新节点上创建默认磁盘。
+    defaultSettings.defaultDataPath:
+      label: 默认数据路径
+      description: 在主机上用于存储数据的默认路径。默认路径是 "/var/lib/longhorn/"。
+    defaultSettings.defaultDataLocality:
+      label: 默认数据本地性
+      description: '如果一个 Longhorn 卷在使用该卷的 pod 的节点上有一个本地副本，我们就认为该卷具有数据本地性。该设置指定了使用 Longhorn UI 创建卷时的默认数据本地性位置。如果是 Kubernetes 配置，请更新 StorageClass 中的 `dataLocality`。可用的模式如下：- **disabled**：默认选项。插入卷（工作负载）的节点可能有也可能没有副本。- **best-effort**：该选项指示 Longhorn 尝试在插入卷（工作负载）的节点上保留一个副本。即使出现磁盘空间不充足、磁盘标签不兼容等环境限制，导致 Longhorn 无法把副本保存在插入卷（工作负载）中的情况，Longhorn 也不会停止该卷。'

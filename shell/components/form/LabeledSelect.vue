@@ -293,7 +293,8 @@ export default {
       @search="onSearch"
       @open="onOpen"
       @close="onClose"
-      @option:selected="$emit('selecting', $event)"
+      @option:selecting="$emit('selecting', $event)"
+      @option:deselecting="$emit('deselecting', $event)"
     >
       <template #option="option">
         <template v-if="showTagPrompts">
@@ -447,6 +448,7 @@ export default {
 
   &.taggable {
     ::v-deep .vs__selected-options {
+
       padding: 3px 0;
       .vs__selected {
         border-color: var(--accent-btn);
@@ -477,6 +479,9 @@ export default {
 
   ::v-deep .v-select:not(.vs--single) {
     .vs__selected-options {
+      flex-grow: 0;
+      flex-basis: 0%;
+      flex-wrap: nowrap;
       padding: 5px 0;
     }
   }

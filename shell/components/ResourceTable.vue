@@ -120,7 +120,6 @@ export default {
       type:    Function,
       default: null
     },
-
     ignoreFilter: {
       type:    Boolean,
       default: false

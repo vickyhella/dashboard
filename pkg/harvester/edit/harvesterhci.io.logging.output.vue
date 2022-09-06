@@ -16,6 +16,11 @@ import isEmpty from 'lodash/isEmpty';
 import jsyaml from 'js-yaml';
 import { createYaml } from '@shell/utils/create-yaml';
 import YamlEditor, { EDITOR_MODES } from '@shell/components/YamlEditor';
+import { FLOW_TYPE } from '../config/harvester-map';
+
+const LOGGING_EVENT = 'Logging/Event';
+const AUDIT_ONLY = 'Audit Only';
+const OUTPUT_TYPE = [LOGGING_EVENT, AUDIT_ONLY];
 
 export default {
   components: {
@@ -25,11 +30,11 @@ export default {
   mixins: [CreateEditView],
 
   async fetch() {
-    await this.$store.dispatch('cluster/findAll', { type: SECRET });
+    await this.$store.dispatch('harvester/findAll', { type: SECRET });
   },
 
   data() {
-    const schemas = this.$store.getters['cluster/all'](SCHEMA);
+    const schemas = this.$store.getters['harvester/all'](SCHEMA);
 
     if (this.isCreate) {
       this.value.metadata.namespace = 'default';
@@ -70,7 +75,7 @@ export default {
       // I'm manipulating the output since I'm not sure it's something we want to actually support
       // seeing as it's really createResourceYaml and this here is a gray area between spoofed types
       // and just a field within a spec.
-      bufferYaml = bufferYaml.substring(bufferYaml.indexOf('\n') + 1).replace(/# {2}/g, '#');
+      bufferYaml = bufferYaml.substring(bufferYaml.indexOf('\n') + 1).replaceAll('#  ', '#');
     }
 
     return {
@@ -78,9 +83,10 @@ export default {
       initialBufferYaml:            bufferYaml,
       providers,
       selectedProvider,
-      hasMultipleProvidersSelected: selectedProviders?.length > 1,
+      hasMultipleProvidersSelected: selectedProviders.length > 1,
       selectedProviders,
-      LOGGING
+      LOGGING,
+      loggingType:                  this.value.loggingType !== FLOW_TYPE.AUDIT ? LOGGING_EVENT : AUDIT_ONLY
     };
   },
 
@@ -91,41 +97,29 @@ export default {
     enabledProviders() {
       return this.providers.filter(p => p.enabled);
     },
-    isNamespaced() {
-      return this.value.type !== LOGGING?.CLUSTER_OUTPUT;
-    },
     cruMode() {
-      if (this.hasMultipleProvidersSelected || !this.value.allProvidersSupported) {
+      if (this.selectedProviders.length > 1 || !this.value.allProvidersSupported) {
         return _VIEW;
       }
 
       return this.mode;
-    }
+    },
+    outputTypeOptions() {
+      return OUTPUT_TYPE;
+    },
   },
 
+  created() {
+    this.registerBeforeHook(this.willSave, 'willSave');
+  },
   methods: {
     getComponent(name) {
-      return require(`./providers/${ name }`).default;
+      return require(`@shell/edit/logging.banzaicloud.io.output/providers/${ name }`).default;
     },
     launch(provider) {
       this.$refs.tabbed.select(provider.name);
     },
-    saveSettings(done) {
-      const t = this.$store.getters['i18n/t'];
-
-      if (this.selectedProvider === 'loki') {
-        const urlCheck = ['https://', 'http://'].some(checkValue => this.value.spec['loki'].url.toLowerCase().startsWith(checkValue));
-        const isLokiHttps = this.value.spec['loki'].url ? urlCheck : undefined;
-
-        if (!isLokiHttps) {
-          this.errors = [t('logging.loki.urlInvalid')];
-
-          return done(false);
-        }
-      }
-
-      this.errors = [];
-
+    willSave() {
       this.value.spec = { [this.selectedProvider]: this.value.spec[this.selectedProvider] };
 
       const bufferJson = jsyaml.load(this.bufferYaml);
@@ -135,7 +129,10 @@ export default {
       } else {
         this.$delete(this.value.spec[this.selectedProvider], 'buffer');
       }
-      this.save(done);
+
+      if (this.loggingType === AUDIT_ONLY) {
+        this.$set(this.value.spec, 'loggingRef', 'harvester-kube-audit-log-ref');
+      }
     },
     tabChanged({ tab }) {
       if ( tab.name === 'buffer' ) {
@@ -167,7 +164,7 @@ export default {
       :errors="errors"
       :can-yaml="true"
       @error="e=>errors = e"
-      @finish="saveSettings"
+      @finish="save"
       @cancel="done"
     >
       <NameNsDescription
@@ -176,54 +173,37 @@ export default {
         :mode="mode"
         label="generic.name"
         :register-before-hook="registerBeforeHook"
-        :namespaced="isNamespaced"
+        :namespaced="value.type !== LOGGING.CLUSTER_OUTPUT"
       />
-      <Banner
-        v-if="hasMultipleProvidersSelected"
-        color="info"
-      >
+      <Banner v-if="selectedProviders.length > 1" color="info">
         {{ t('logging.output.tips.singleProvider') }}
       </Banner>
-      <Banner
-        v-else-if="!value.allProvidersSupported"
-        color="info"
-      >
+      <Banner v-else-if="!value.allProvidersSupported" color="info">
         {{ t('logging.output.tips.multipleProviders') }}
       </Banner>
-      <Tabbed
-        v-else
-        ref="tabbed"
-        :side-tabs="true"
-        @changed="tabChanged($event)"
-      >
-        <Tab
-          name="Output"
-          label="Output"
-          :weight="2"
-        >
+      <Tabbed v-else ref="tabbed" :side-tabs="true" @changed="tabChanged($event)">
+        <Tab name="Output" label="Output" :weight="2">
           <div class="row">
             <div class="col span-6">
               <LabeledSelect
-                v-model="selectedProvider"
-                label="Output"
-                :options="providers"
+                v-model="loggingType"
+                class="mb-20"
+                :options="outputTypeOptions"
+                :disabled="!isCreate"
                 :mode="mode"
+                :label="t('generic.type')"
               />
             </div>
           </div>
-          <div class="spacer" />
-          <component
-            :is="getComponent(selectedProvider)"
-            :value="value.spec[selectedProvider]"
-            :namespace="value.namespace"
-            :mode="mode"
-          />
+          <div class="row">
+            <div class="col span-6">
+              <LabeledSelect v-model="selectedProvider" label="Output" :options="providers" :mode="mode" />
+            </div>
+          </div>
+          <div class="spacer"></div>
+          <component :is="getComponent(selectedProvider)" :value="value.spec[selectedProvider]" :namespace="value.namespace" :mode="mode" />
         </Tab>
-        <Tab
-          name="buffer"
-          :label="t('logging.output.buffer.label')"
-          :weight="1"
-        >
+        <Tab name="buffer" :label="t('logging.output.buffer.label')" :weight="1">
           <YamlEditor
             ref="yaml"
             v-model="bufferYaml"

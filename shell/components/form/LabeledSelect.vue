@@ -6,6 +6,7 @@ import { LabeledTooltip } from '@components/LabeledTooltip';
 import VueSelectOverrides from '@shell/mixins/vue-select-overrides';
 import { onClickOption, calculatePosition } from '@shell/utils/select';
 import isEqual from 'lodash/isEqual';
+import { mapGetters } from 'vuex';
 
 export default {
   name: 'LabeledSelect',
@@ -92,6 +93,7 @@ export default {
       type:    Boolean,
       default: true
     },
+
   },
 
   data() {
@@ -102,9 +104,15 @@ export default {
   },
 
   computed: {
+    ...mapGetters({ t: 'i18n/t' }),
     hasLabel() {
       return this.isCompact ? false : !!this.label || !!this.labelKey || !!this.$slots.label;
     },
+
+    // update placeholder text to inform user they can add their own opts when none are found
+    showTagPrompts() {
+      return !this.options.length && this.$attrs.taggable;
+    }
   },
 
   methods: {
@@ -288,7 +296,12 @@ export default {
       @option:selected="$emit('selecting', $event)"
     >
       <template #option="option">
-        <template v-if="option.kind === 'group'">
+        <template v-if="showTagPrompts">
+          <div class="only-user-opts">
+            {{ t('labeledSelect.pressEnter', {input:getOptionLabel(option.label)}) }}
+          </div>
+        </template>
+        <template v-else-if="option.kind === 'group'">
           <div class="vs__option-kind-group">
             <b>{{ getOptionLabel(option) }}</b>
             <div v-if="option.badge">
@@ -315,6 +328,12 @@ export default {
             style="font-size: 20px;"
           />
         </div>
+      </template>
+      <template
+        v-if="showTagPrompts"
+        v-slot:no-options="{ searching }"
+      >
+        <span v-if="!searching">{{ t('labeledSelect.startTyping') }}</span>
       </template>
       <!-- Pass down templates provided by the caller -->
       <template
@@ -539,4 +558,10 @@ export default {
   }
 }
 
+.vs__dropdown-menu .vs__dropdown-option .only-user-opts{
+    color: var(--dropdown-text);
+    background-color: var(--dropdown-bg);
+    margin: 0px calc(-#{$input-padding-sm}/2);
+    padding: 3px 20px;
+}
 </style>

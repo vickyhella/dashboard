@@ -435,12 +435,12 @@ export default {
               class="masthead-state"
               :value="value"
             />
-            <a 
+            <a
               v-if="dev && !!resourceExternalLink"
               v-tooltip="t(resourceExternalLink.tipsKey || 'generic.resourceExternalLinkTips')"
-              class="resource-external" 
-              rel="nofollow noopener noreferrer" 
-              target="_blank" 
+              class="resource-external"
+              rel="nofollow noopener noreferrer"
+              target="_blank"
               :href="resourceExternalLink"
             >
               <i class="icon icon-external-link" />

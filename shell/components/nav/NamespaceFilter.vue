@@ -133,6 +133,13 @@ export default {
     options() {
       const t = this.$store.getters['i18n/t'];
       let out = [];
+      const inStore = this.$store.getters['currentStore'](NAMESPACE);
+
+      const params = { ...this.$route.params };
+      const resource = params.resource;
+
+      // Sometimes, different pages may have different namespaces to filter
+      const notFilterNamespaces = this.$store.getters[`type-map/optionsFor`](resource).notFilterNamespace || [];
 
       const params = { ...this.$route.params };
       const resource = params.resource;
@@ -190,8 +197,6 @@ export default {
 
         divider(out);
       }
-
-      const inStore = this.$store.getters['currentStore'](NAMESPACE);
 
       if (!inStore) {
         return out;

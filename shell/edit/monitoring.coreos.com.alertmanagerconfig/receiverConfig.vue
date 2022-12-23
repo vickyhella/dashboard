@@ -261,6 +261,19 @@ export default {
       } else {
         this.errors = [err];
       }
+    },
+
+    saveReceiver(buttonDone) {
+      this.errors = [];
+
+      if (!this.value.name) {
+        this.errors.push(this.$store.getters['i18n/t']('validation.required', { key: 'Name' }));
+        buttonDone(false);
+
+        return;
+      }
+
+      this.saveOverride(buttonDone);
     }
   }
 };
@@ -278,7 +291,7 @@ export default {
     :cancel-event="true"
     :validation-passed="fvFormIsValid"
     @error="e=>errors = e"
-    @finish="saveOverride"
+    @finish="saveReceiver"
     @cancel="redirectAfterCancel"
   >
     <div class="row mb-10">

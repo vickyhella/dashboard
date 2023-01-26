@@ -110,7 +110,11 @@ export default {
 
     flatView() {
       return (this.$route.query[FLAT_VIEW] || false);
-    }
+    },
+
+    showPodSecurityAdmission() {
+      return !this.isSingleHarvester;
+    },
   },
 
   watch: {
@@ -242,6 +246,7 @@ export default {
         />
       </Tab>
       <Tab
+        v-if="showPodSecurityAdmission"
         name="pod-security-admission"
         label-key="podSecurityAdmission.name"
         :label="t('podSecurityAdmission.name')"

@@ -1083,13 +1083,6 @@ advancedSettings:
     'harv-release-download-url': This setting allows you to configure the <code>upgrade release download</code> URL address. Harvester will get the ISO URL and checksum value from the (<code>$URL</code>/<code>$VERSION</code>/version.yaml) file hosted by the configured URL.
     'harv-rancher-manager-support': Multi-cluster provisioning and management of Kubernetes clusters.
 
-workload:
-  scheduling:
-    affinity:
-      thisPodNamespace: This VM's namespace
-      matchExpressions:
-        inNamespaces: "VMs in these namespaces:"
-
 typeLabel:
   kubevirt.io.virtualmachine: |-
     {count, plural,

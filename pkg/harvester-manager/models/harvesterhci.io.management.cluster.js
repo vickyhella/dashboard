@@ -175,6 +175,7 @@ export default class HciCluster extends ProvCluster {
   async loadClusterPlugin() {
     // Skip loading if it's built in
     const plugins = this.$rootState.$plugin.getPlugins();
+
     const loadedPkgs = Object.keys(plugins);
 
     if (loadedPkgs.find(pkg => pkg === HARVESTER_NAME) && this.mgmt.id === 'local') {

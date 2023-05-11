@@ -1215,3 +1215,8 @@ typeLabel:
       one { Secret }
       other { Secrets }
     }
+  harvesterhci.io.blockdevice: |-
+    {count, plural,
+      one { Disk }
+      other { Disks }
+    }

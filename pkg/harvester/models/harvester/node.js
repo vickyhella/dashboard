@@ -21,6 +21,9 @@ const ALLOW_SYSTEM_LABEL_KEYS = [
   'topology.kubernetes.io/region',
 ];
 
+const HEALTHY = 'healthy';
+const WARNING = 'warning';
+
 export default class HciNode extends HarvesterResource {
   get _availableActions() {
     const cordon = {
@@ -326,6 +329,14 @@ export default class HciNode extends HarvesterResource {
         schedulableCondition = conditions.Schedulable;
       }
 
+      let state;
+
+      if (readyCondition?.status !== 'True' || schedulableCondition?.status !== 'True') {
+        state = WARNING;
+      } else {
+        state = HEALTHY;
+      }
+
       return {
         ...diskSpec[key],
         ...diskStatus[key],
@@ -336,6 +347,7 @@ export default class HciNode extends HarvesterResource {
         storageScheduled: diskStatus[key]?.storageScheduled,
         readyCondition,
         schedulableCondition,
+        state,
       };
     });
 
@@ -387,6 +399,32 @@ export default class HciNode extends HarvesterResource {
     const blockDevices = this.$rootGetters[`${ inStore }/all`](HCI.BLOCK_DEVICE);
 
     return blockDevices.filter(s => s?.spec?.nodeName === nodeId) || [];
+  }
+
+  get unProvisionedDisks() {
+    const blockDevices = this.blockDevices || [];
+
+    return blockDevices.filter(d => d?.spec?.fileSystem?.provisioned && d?.status?.provisionPhase !== 'Provisioned');
+  }
+
+  get diskStatusCount() {
+    const errorBlockDevices = this.unProvisionedDisks.filter(b => b.metadata.state.error) || [];
+
+    let errorCount = 0;
+
+    this.longhornDisks.map((d) => {
+      if (d.state === 'warning') {
+        errorCount++;
+      }
+    });
+
+    const total = this.longhornDisks.length + errorBlockDevices.length;
+
+    return {
+      total,
+      errorCount: errorCount + errorBlockDevices.length,
+      useful:     total - errorCount,
+    };
   }
 
   get manufacturer() {

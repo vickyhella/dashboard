@@ -15,7 +15,6 @@ import MoveModal from '@shell/components/MoveModal';
 import ResourceQuota from '@shell/components/form/ResourceQuota/Namespace';
 import Loading from '@shell/components/Loading';
 import { HARVESTER_TYPES, RANCHER_TYPES } from '@shell/components/form/ResourceQuota/shared';
-import { HARVESTER_NAME as HARVESTER } from '@shell/config/features';
 import Labels from '@shell/components/form/Labels';
 
 export default {
@@ -65,7 +64,7 @@ export default {
   },
 
   computed: {
-    ...mapGetters(['isStandaloneHarvester']),
+    ...mapGetters(['isStandaloneHarvester', 'isRancherInHarvester']),
 
     isCreate() {
       return this.mode === _CREATE;

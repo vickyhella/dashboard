@@ -227,6 +227,7 @@ export const state = () => {
   return {
     managementReady:         false,
     clusterReady:            false,
+    isMultiCluster:          false,
     isRancher:               false,
     namespaceFilters:        [],
     activeNamespaceCache:    {}, // Used to efficiently check if a resource should be displayed

@@ -16,6 +16,7 @@ import ResourceQuota from '@shell/components/form/ResourceQuota/Namespace';
 import Loading from '@shell/components/Loading';
 import { HARVESTER_TYPES, RANCHER_TYPES } from '@shell/components/form/ResourceQuota/shared';
 import Labels from '@shell/components/form/Labels';
+import { HARVESTER_NAME as HARVESTER } from '@shell/config/features';
 
 export default {
   components: {

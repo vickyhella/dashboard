@@ -393,7 +393,7 @@ export default {
         <div class="row">
           <div class="col span-12">
             <Banner :color="(matchingNodes.none ? 'warning' : 'success')">
-              <span v-html="t('harvester.vlanConfig.nodeSelector.matchingNodes.matchesSome', matchingNodes)" />
+              <span v-clean-html="t('harvester.vlanConfig.nodeSelector.matchingNodes.matchesSome', matchingNodes)" />
             </Banner>
           </div>
         </div>

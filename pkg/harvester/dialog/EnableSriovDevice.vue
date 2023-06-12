@@ -67,8 +67,8 @@ export default {
   <Card :show-highlight-border="false">
     <template v-slot:title>
       <h4
+        v-clean-html="t('promptRemove.title')"
         class="text-default-text"
-        v-html="t('promptRemove.title')"
       />
     </template>
 

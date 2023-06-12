@@ -290,7 +290,7 @@ export default {
         <div class="row">
           <div class="col span-12">
             <Banner :color="(matchingVMs.none ? 'warning' : 'success')">
-              <span v-html="t('harvester.loadBalancer.backendServerSelector.matchingVMs.matchesSome', matchingVMs)" />
+              <span v-clean-html="t('harvester.loadBalancer.backendServerSelector.matchingVMs.matchesSome', matchingVMs)" />
             </Banner>
           </div>
         </div>

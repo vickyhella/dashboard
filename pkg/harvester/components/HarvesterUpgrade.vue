@@ -163,7 +163,7 @@ export default {
           </div>
 
           <div v-if="version">
-            <p class="mb-10" v-html="t('harvester.upgradePage.releaseTip', {url: releaseLink}, true)"></p>
+            <p v-clean-html="t('harvester.upgradePage.releaseTip', {url: releaseLink}, true)" class="mb-10"></p>
 
             <Checkbox v-model="readyReleaseNote" class="check" type="checkbox" label-key="harvester.upgradePage.checkReady" />
           </div>

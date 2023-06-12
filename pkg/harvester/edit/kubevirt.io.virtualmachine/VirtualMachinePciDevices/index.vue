@@ -207,7 +207,7 @@ export default {
     >
       <div class="col span-12">
         <Banner color="warning">
-          <p v-html="t('harvester.pci.oldFormatDevices.help', {oldFormatDevicesHTML}, true)" />
+          <p v-clean-html="t('harvester.pci.oldFormatDevices.help', {oldFormatDevicesHTML}, true)" />
         </Banner>
       </div>
     </div>

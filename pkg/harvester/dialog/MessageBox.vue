@@ -42,7 +42,7 @@ export default {
     </h4>
 
     <template #body>
-      <p v-html="t(modalData.contentKey)"></p>
+      <p v-clean-html="t(modalData.contentKey)"></p>
     </template>
 
     <div slot="actions" class="actions">

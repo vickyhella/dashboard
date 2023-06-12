@@ -51,11 +51,11 @@ export default {
     @closed="close"
   >
     <Card class="prompt-restart" :show-highlight-border="false">
-      <h4 slot="title" class="text-default-text" v-html="t('harvester.modal.restart.title')" />
+      <h4 slot="title" v-clean-html="t('harvester.modal.restart.title')" class="text-default-text" />
 
       <template slot="body">
         <slot name="body">
-          <div class="pl-10 pr-10" v-html="t('harvester.modal.restart.tip')">
+          <div v-clean-html="t('harvester.modal.restart.tip')" class="pl-10 pr-10">
           </div>
         </slot>
       </template>

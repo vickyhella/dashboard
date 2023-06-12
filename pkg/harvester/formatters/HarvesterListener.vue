@@ -66,7 +66,7 @@ export default {
       v-for="(port, index) in parsed"
       :key="index"
     >
-      <span v-html="port.html" />
+      <span v-clean-html="port.html" />
     </div>
   </div>
 </template>

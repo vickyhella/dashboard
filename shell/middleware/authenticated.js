@@ -153,7 +153,7 @@ export default async function({
 
     firstLogin = res?.value === 'true';
 
-    if (!initialPass && plSetting?.value === 'Harvester') {
+    if (!initialPass && plSetting?.default === 'Harvester') {
       initialPass = 'admin';
     }
   } catch (e) {
@@ -175,7 +175,7 @@ export default async function({
         opt:  { url: `/v3/settings/${ SETTING.PL }` }
       });
 
-      if (!initialPass && plSetting?.value === 'Harvester') {
+      if (!initialPass && plSetting?.default === 'Harvester') {
         initialPass = 'admin';
       }
     } catch (e) {
